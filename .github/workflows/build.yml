@@ -1,0 +1,40 @@
+name: Deploy 🚀
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy-and-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: "master"
+
+      - name: Install pnpm
+        run: pnpm install -g pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "23"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run generate
+
+      - name: Deploy to GitHub Pages 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          folder: .output/public
